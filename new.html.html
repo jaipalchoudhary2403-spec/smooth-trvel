@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Booking Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input[type="tel"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .distance {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .price {
+            font-size: 20px;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .option.selected .price {
+            color: #fff;
+        }
+
+        .payment-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-option:hover {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .payment-option.selected {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+
+        .upi-input {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .upi-input.show {
+            display: block;
+        }
+
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            background: #ddd;
+            border-radius: 10px;
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .summary {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page 1: Registration -->
+        <div id="registerPage">
+            <h1>🚗 Quick Ride</h1>
+            <p style="color: #666; margin-bottom: 30px;">Enter your phone number to get started</p>
+            <div class="input-group">
+                <input type="tel" id="phoneNumber" placeholder="Enter Phone Number (10 digits)" maxlength="10" pattern="[0-9]{10}">
+            </div>
+            <button class="btn" onclick="nextPage()">Continue</button>
+        </div>
+
+        <!-- Page 2: Distance Selection -->
+        <div id="distancePage" class="hidden">
+            <h2>Choose Your Distance</h2>
+            <div class="option" onclick="selectOption(this, '500m', 5)">
+                <div class="distance">500 meters</div>
+                <div class="price">₹5 only</div>
+            </div>
+            <div class="option" onclick="selectOption(this, '1.5km', 20)">
+                <div class="distance">1.5 KM</div>
+                <div class="price">₹20 only</div>
+            </div>
+            <div class="option" onclick="selectOption(this, '3km', 50)">
+                <div class="distance">3 KM</div>
+                <div class="price">₹50 only</div>
+            </div>
+            <button class="btn back-btn" onclick="goBack('registerPage')">← Back</button>
+            <button class="btn" id="proceedBtn" onclick="nextPage()" disabled>Proceed to Payment</button>
+        </div>
+
+        <!-- Page 3: Payment -->
+        <div id="paymentPage" class="hidden">
+            <h2>Payment Method</h2>
+            <div class="summary">
+                <div><strong>Phone:</strong> <span id="summaryPhone">-</span></div>
+                <div><strong>Distance:</strong> <span id="summaryDistance">-</span></div>
+                <div><strong>Amount:</strong> <span id="summaryAmount">₹0</span></div>
+            </div>
+            
+            <div class="payment-option" onclick="selectPayment(this, 'upi')">
+                <span>💳 UPI Payment</span>
+            </div>
+            <div class="payment-option" onclick="selectPayment(this, 'qr')">
+                <span>📱 QR Code</span>
+            </div>
+
+            <!-- UPI Input -->
+            <div class="upi-input" id="upiInput">
+                <input type="text" id="upiId" placeholder="Enter UPI ID (example@ybl)" style="width: 100%; padding: 12px; border: 2px solid #28a745; border-radius: 8px; margin-bottom: 10px;">
+                <button class="btn" onclick="processPayment('upi')">Pay Now</button>
+            </div>
+
+            <!-- QR Code -->
+            <div class="qr-code" id="qrCode">
+                📱 Scan QR Code
+            </div>
+            <button class="btn" id="qrPayBtn" onclick="processPayment('qr')" style="display: none;">Confirm Payment</button>
+
+            <button class="btn back-btn" onclick="goBack('distancePage')">← Back</button>
+        </div>
+
+        <!-- Success Page -->
+        <div id="successPage" class="hidden">
+            <h1>✅ Booking Confirmed!</h1>
+            <p style="color: #28a745; font-size: 18px; margin: 20px 0;">Your ride will arrive in 5 minutes</p>
+            <div style="background: #d4edda; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <div><strong>Booking Details:</strong></div>
+                <div>Phone: <span id="finalPhone">-</span></div>
+                <div>Distance: <span id="finalDistance">-</span></div>
+                <div>Amount: <span id="finalAmount">₹0</span></div>
+                <div>Payment: <span id="finalPayment">-</span></div>
+            </div>
+            <button class="btn" onclick="location.reload()">Book Another Ride</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedDistance = '';
+        let selectedAmount = 0;
+        let selectedPayment = '';
+        let phoneNumber = '';
+
+        function nextPage() {
+            if (document.getElementById('registerPage').style.display !== 'none') {
+                const phone = document.getElementById('phoneNumber').value;
+                if (phone.length === 10 && /^\d{10}$/.test(phone)) {
+                    phoneNumber = phone;
+                    showPage('distancePage');
+                } else {
+                    alert('Please enter a valid 10-digit phone number');
+                    return;
+                }
+            } else if (document.getElementById('distancePage').style.display !== 'none') {
+                if (selectedDistance) {
+                    showPage('paymentPage');
+                } else {
+                    alert('Please select a distance option');
+                }
+            }
+        }
+
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = ['registerPage', 'distancePage', 'paymentPage', 'successPage'];
+            pages.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            // Show selected page
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        function goBack(pageId) {
+            showPage(pageId);
+        }
+
+        function selectOption(element, distance, amount) {
+            // Remove previous selection
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            // Add selection to current
+            element.classList.add('selected');
+            selectedDistance = distance;
+            selectedAmount = amount;
+            document.getElementById('proceedBtn').disabled = false;
+        }
+
+        function selectPayment(element, method) {
+            // Remove previous selection
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+            // Add selection to current
+            element.classList.add('selected');
+            selectedPayment = method;
+
+            if (method === 'upi') {
+                document.getElementById('upiInput').classList.add('show');
+                document.getElementById('qrCode').style.display = 'none';
+                document.getElementById('qrPayBtn').style.display = 'none';
+            } else {
+                document.getElementById('upiInput').classList.remove('show');
+                document.getElementById('qrCode').style.display = 'flex';
+                document.getElementById('qrPayBtn').style.display = 'block';
+            }
+        }
+
+        function processPayment(method) {
+            if (method === 'upi') {
+                const upiId = document.getElementById('upiId').value;
+                if (!upiId) {
+                    alert('Please enter UPI ID');
+                    return;
+                }
+            }
+
+            // Update summary before going to success page
+            updateSummary();
+
+            // Show success page
+            showPage('successPage');
+        }
+
+        function updateSummary() {
+            document.getElementById('summaryPhone').textContent = phoneNumber;
+            document.getElementById('summaryDistance').textContent = selectedDistance;
+            document.getElementById('summaryAmount').textContent = `₹${selectedAmount}`;
+            
+            document.getElementById('finalPhone').textContent = phoneNumber;
+            document.getElementById('finalDistance').textContent = selectedDistance;
+            document.getElementById('finalAmount').textContent = `₹${selectedAmount}`;
+            document.getElementById('finalPayment').textContent = selectedPayment === 'upi' ? 'UPI' : 'QR Code';
+        }
+    </script>
+</body>
+</html>
